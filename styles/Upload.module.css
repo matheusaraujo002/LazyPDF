@@ -47,6 +47,20 @@
     font-size: 20px;
   }
 
+  .imagemSelecionada {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 500px;
+    max-height: 400px;
+    min-width: 150px;
+    min-height: 100px;
+    overflow: hidden;
+    object-fit: cover;
+    position: relative;
+  }
+
   .uploadImage {
     width: 15%;
     max-width: 100px;

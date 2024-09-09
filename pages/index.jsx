@@ -1,5 +1,6 @@
 import Head from "next/head";
 import MainPage from "@/components/MainPage";
+import styles from '@/styles/Upload.module.css';
 
 export default function Home() {
   return (
@@ -10,7 +11,16 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <MainPage />
+      <div className={styles.body}>
+        <header className={styles.header}>
+          <h1>LazyPDF</h1>
+        </header>
+        <main className={styles.main}>
+          <div className={styles.containerMain}>
+            <MainPage />
+          </div>
+        </main>
+      </div>
     </>
   );
 }
