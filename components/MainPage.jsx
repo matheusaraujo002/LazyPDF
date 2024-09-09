@@ -1,52 +1,60 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import {React, useState } from 'react';
 import styles from '@/styles/Upload.module.css';
 import Image from "next/image";
 import img from '@/public/uploadImage.png';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const UploadPage = () => {
-    const [selectedImage, setSelectedImage] = useState(null);
-    const [extractedText, setExtractedText] = useState('');
+export default function ImageUpload() {
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [extractedText, setExtractedText] = useState('');
 
-    const handleFileChange = (event) => {
-        const file = event.target.files[0];
-        setSelectedImage(file);
-    };
+  const handleFileChange = (event) => {
+    setSelectedImage(event.target.files[0]);
+  };
 
-    const apiKey = 'API_KEY'; // Substitua pela sua chave de API
-    const imageUrl = 'https://example.com/image.jpg';
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-    const handleSubmit = async () => {
-      try {
-        const response = await axios.post('https://vision.googleapis.com/v1/images:annotate',
+    if (!selectedImage) return;
+
+    try {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          // Utiliza a API do Gemini para extração de texto da imagem dentro do arquivo .env.local
+          const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GOOGLE_API_KEY);
+          const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+          const imageBase64 = reader.result.split(',')[1];
+          const prompt = "Você recebeu uma imagem nesse prompt? Se sim, escreva tudo que tiver de texto nessa imagem.";
+          const imageParts = [
             {
-            requests: [
-                {
-                    image: {
-                      source: {
-                        imageUri: imageUrl
-                      }
-                    },
-                    features: [
-                      { type: 'TEXT_DETECTION' }
-                    ]
-                }
-            ]
+              inlineData: {
+                data: imageBase64,
+                mimeType: selectedImage.type,
+              },
             },
-            {
-                headers: {
-                    'Authorization': `Bearer ${apiKey}`,
-                    'Content-Type': 'application/json'
-                }
-            }
-        );
+          ];
 
-        // Processar a resposta da API
-        console.log(response.data);
-      } catch (error) {
-        console.error('Erro ao enviar a imagem:', error);
-      }
-    };
+          // Aguarda a resposta da API do Gemini
+          const result = await model.generateContent([prompt, ...imageParts]);
+          const response = await result.response;
+          const text = response.text();
+          console.log(text);
+
+          // Define o texto extraído após a resposta da API
+          setExtractedText(text); 
+        } catch (error) {
+          console.error('Erro ao extrair texto da imagem (Gemini API):', error);
+        }
+      };
+
+      reader.readAsDataURL(selectedImage);
+    } catch (error) {
+      console.error('Erro ao ler a imagem:', error);
+    }
+  };
+
+  // ... resto do seu componente (JSX igual ao anterior)
 
   return (
     <div className={styles.body}>
@@ -89,5 +97,3 @@ const UploadPage = () => {
   </div>
 );
 };
-
-export default UploadPage;
