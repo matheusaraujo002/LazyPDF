@@ -12,9 +12,13 @@
     "@google/generative-ai": "^0.17.1",
     "axios": "^1.7.7",
     "dotenv": "^16.4.5",
+    "html-to-pdfmake": "^2.5.13",
+    "jspdf": "^2.5.2",
     "next": "14.2.8",
+    "pdfmake": "^0.2.13",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-quill": "^2.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.5"
