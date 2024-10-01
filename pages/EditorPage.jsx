@@ -21,6 +21,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs; // Configura as fontes do pdfmake
 
 const TextEditor = ({ initialText = '' }) => {
   const [text, setText] = useState(initialText);
+  const [showConfirmation, setShowConfirmation] = useState(false); // Estado para controlar a visibilidade da confirmação
 
   useEffect(() => {
     const storedText = sessionStorage.getItem('extractedText');
@@ -34,12 +35,24 @@ const TextEditor = ({ initialText = '' }) => {
   };
 
   const handleDownloadPdf = () => {
-    const html = text; 
+    setShowConfirmation(true); // Mostra a tela de confirmação
+  };
+
+  const confirmDownload = () => {
+    const html = text;
     const docDefinition = {
-      content: htmlToPdfmake(html) 
+      content: htmlToPdfmake(html)
     };
 
-    pdfMake.createPdf(docDefinition).download('texto_editado.pdf');
+    pdfMake.createPdf(docDefinition).download('texto_extraido.pdf');
+    setShowConfirmation(false);
+  };
+
+  const cancelDownload = (event) => {
+    // Verifica se o clique foi no overlay e não na caixa de confirmação
+    if (event.target === event.currentTarget) {
+      setShowConfirmation(false);
+    }
   };
 
   return (
@@ -58,9 +71,23 @@ const TextEditor = ({ initialText = '' }) => {
           <h3>Editor de Texto</h3>
           <p>Edite ou faça download do texto escaneado da sua imagem.</p>
         </article>
+
         <button onClick={handleDownloadPdf} className={stylesEditor.downloadButton}> 
-          <span className="material-symbols-outlined">download</span> Download PDF
+          <span className="material-symbols-outlined">Baixar PDF</span>
         </button>
+
+        {showConfirmation && (
+          <div className={`${stylesEditor.confirmationOverlay} ${showConfirmation ? stylesEditor['confirmationOverlay-enter'] : stylesEditor['confirmationOverlay-exit']}`} onClick={cancelDownload}>
+            <div className={stylesEditor.confirmationBox} onClick={(e) => e.stopPropagation()}>
+              <p>Deseja fazer o download do texto ou ainda precisa editar?</p>
+              <div className={stylesEditor.confirmationButtons}>
+                <button onClick={confirmDownload}>Baixar PDF</button>
+                <button onClick={cancelDownload}>Voltar e editar</button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <main className={stylesEditor.main}>
           <div className={stylesEditor.editorContainer}>
             <ReactQuill
