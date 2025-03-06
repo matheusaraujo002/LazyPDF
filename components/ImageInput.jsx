@@ -27,7 +27,7 @@ export default function ImageInput({ onStartLoading }) {
           const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GOOGLE_API_KEY);
           const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
           const imageBase64 = reader.result.split(',')[1];
-          const prompt = "Você recebeu uma imagem nesse prompt? Se sim, escreva tudo que tiver de texto nessa imagem. Não adicione icones ou imagem nesse texto gerado. Entregue o texto em um formato adequado para PDF.";
+          const prompt = "Você recebeu uma imagem nesse prompt? Se sim, escreva tudo que tiver de texto nessa imagem. Não adicione icones ou imagem nesse texto gerado. Entregue o texto em um formato adequado para PDF. E não comente NADA que não seja somente o retorno do texto que você vai extrair da imagem";
           const imageParts = [
             {
               inlineData: {
